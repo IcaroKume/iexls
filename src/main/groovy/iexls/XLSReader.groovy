@@ -30,14 +30,14 @@ class XLSReader {
         }
     }
 
-    List<Data> read () {
+    List<DataReader> read () {
         def sheetData = workbook.sheetIterator().collect {
             extractData it
         }
         sheetData.findAll {it != null}
     }
 
-    private Data extractData(Sheet sheet) {
+    private DataReader extractData(Sheet sheet) {
         def rows = sheet.rowIterator()
         if (!rows.hasNext()) {
             return null
@@ -51,7 +51,7 @@ class XLSReader {
             extractRow it
         }
 
-        new Data(headers: headers, rowValues: rowValues)
+        new DataReader(headers: headers, rowValues: rowValues)
     }
 
     private List extractRow(Row row) {

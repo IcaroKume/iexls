@@ -3,7 +3,7 @@ package iexls
 /**
  * Created by icarokume on 19/09/16.
  */
-class Data {
+class DataReader {
 
     List headers
 
