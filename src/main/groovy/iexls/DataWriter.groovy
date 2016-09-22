@@ -1,5 +1,7 @@
 package iexls
 
+import org.apache.poi.ss.usermodel.IndexedColors
+
 /**
  * Created by icarokume on 21/09/16.
  */
@@ -13,9 +15,9 @@ class DataWriter {
         rowValues[row][headers.indexOf(header)]
     }
 
-    Map headerStyle = [:]
+    IexlsCellStyle headerStyle = new IexlsCellStyle(backgroundColor: IndexedColors.GREY_25_PERCENT.getIndex())
 
-    Map rowStyle = [:]
+    IexlsCellStyle rowStyle = new IexlsCellStyle(backgroundColor: IndexedColors.WHITE.getIndex())
 
     String sheetName
 }
