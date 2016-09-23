@@ -17,7 +17,6 @@ class XLSWriter {
 
     def write(DataWriter data) {
         Workbook wb = new HSSFWorkbook()
-        CreationHelper createHelper = wb.getCreationHelper()
 
         String safeName = WorkbookUtil.createSafeSheetName(data.sheetName)
 
@@ -28,7 +27,7 @@ class XLSWriter {
         def header = sheet.createRow(i++)
 
         int j = 0
-        CellStyle headerStyle = createStyle(wb, data.headerStyle)
+        CellStyle headerStyle = createStyleHeader(wb, data.headerStyle)
         data.headers.each {
             def cell = header.createCell(j)
             cell.setCellStyle(headerStyle)
@@ -42,11 +41,8 @@ class XLSWriter {
             j = 0
             r.each {
                 def cell = row.createCell(j++)
-                CellStyle rowStyle = createStyle(wb, data.rowStyle)
-                if (it in Date) {
-                    rowStyle.setDataFormat(
-                            createHelper.createDataFormat().getFormat("m/d/yy"))
-                }
+                CellStyle rowStyle = createStyleRow(wb, data.rowStyle, it)
+
                 cell.setCellStyle(rowStyle)
                 cell.setCellValue(it)
             }
@@ -56,7 +52,17 @@ class XLSWriter {
 
     }
 
-    private CellStyle createStyle(Workbook wb, IexlsCellStyle cellStyle) {
+    protected createStyleHeader(Workbook wb, IexlsCellStyle cellStyle) {
+        createStyle(wb, cellStyle, null)
+    }
+
+    protected createStyleRow(Workbook wb, IexlsCellStyle cellStyle, def value) {
+        createStyle(wb, cellStyle, value)
+    }
+
+    protected CellStyle createStyle(Workbook wb, IexlsCellStyle cellStyle, def value) {
+        CreationHelper createHelper = wb.getCreationHelper()
+
         def style = wb.createCellStyle()
         style.setFillForegroundColor(cellStyle.backgroundColor)
         style.setFillPattern(CellStyle.SOLID_FOREGROUND)
@@ -68,6 +74,12 @@ class XLSWriter {
         style.setRightBorderColor(IndexedColors.BLACK.getIndex());
         style.setBorderTop(CellStyle.BORDER_THIN);
         style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+
+        if (value in Date) {
+            style.setDataFormat(
+                    createHelper.createDataFormat().getFormat("m/d/yy"))
+        }
+
         style
     }
 
