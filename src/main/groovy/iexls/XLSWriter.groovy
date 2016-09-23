@@ -1,13 +1,7 @@
 package iexls
 
-import org.apache.poi.hssf.usermodel.HSSFCell
-import org.apache.poi.hssf.usermodel.HSSFRow
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.ss.usermodel.CreationHelper
-import org.apache.poi.ss.usermodel.IndexedColors
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.WorkbookUtil
 
 /**
@@ -15,7 +9,13 @@ import org.apache.poi.ss.util.WorkbookUtil
  */
 class XLSWriter {
 
-    def write(DataWriter data, OutputStream output) {
+    OutputStream output
+
+    XLSWriter(OutputStream output) {
+        this.output = output
+    }
+
+    def write(DataWriter data) {
         Workbook wb = new HSSFWorkbook()
         CreationHelper createHelper = wb.getCreationHelper()
 

@@ -9,9 +9,6 @@ class XLSWriterSpec extends Specification {
 
     def "test"() {
         given:
-        def writer = new XLSWriter()
-
-
         def string = 'Luiz'
         def number = 17
         def date = new Date()
@@ -22,9 +19,10 @@ class XLSWriterSpec extends Specification {
                 rowValues: [[string, number, date, bool]]
         )
         def output = new ByteArrayOutputStream()
+        def writer = new XLSWriter(output)
 
         when:
-        writer.write(dataWriter, output)
+        writer.write(dataWriter)
         def reader = new XLSReader(new ByteArrayInputStream(output.toByteArray()))
         List datas = reader.read()
 
@@ -42,9 +40,6 @@ class XLSWriterSpec extends Specification {
 
     def "test create file"() {
         given:
-        def writer = new XLSWriter()
-
-
         def string = 'Luiz'
         def number = 17
         def date = new Date()
@@ -55,9 +50,10 @@ class XLSWriterSpec extends Specification {
                 rowValues: [[string, number, date, bool]]
         )
         def output = new FileOutputStream('build/testout.xls')
+        def writer = new XLSWriter(output)
 
         when:
-        writer.write(dataWriter, output)
+        writer.write(dataWriter)
         output.close()
 
         def reader = new XLSReader(new FileInputStream('build/testout.xls'))
