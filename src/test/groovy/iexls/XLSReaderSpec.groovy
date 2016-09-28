@@ -11,10 +11,12 @@ class XLSReaderSpec extends Specification {
         def reader = new XLSReader(new FileInputStream(this.class.getResource('test1.xlsx').file))
 
         when:
-        def result = reader.read()
+        def result = reader.read('Pessoa')
         def data = result.first()
 
         then:
+        data.serviceName == 'Pessoa'
+
         data.headers.find {it == 'Nome'}
         data.headers.find {it == 'Idade'}
         data.headers.find {it == 'Nascimento'}
@@ -44,10 +46,12 @@ class XLSReaderSpec extends Specification {
         def reader = new XLSReader(new FileInputStream(this.class.getResource('test2.xls').file))
 
         when:
-        def result = reader.read()
+        def result = reader.read('Pessoa')
         def data = result.first()
 
         then:
+        data.serviceName == 'Pessoa'
+
         data.headers.find {it == 'Nome'}
         data.headers.find {it == 'Idade'}
         data.headers.find {it == 'Nascimento'}

@@ -9,6 +9,8 @@ class DataReader {
 
     List rowValues
 
+    String serviceName
+
     def getValue(String header, Integer row) {
         rowValues[row][headers.indexOf(header)]
     }
