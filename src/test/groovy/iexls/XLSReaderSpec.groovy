@@ -76,4 +76,46 @@ class XLSReaderSpec extends Specification {
         data.getValue('Soma data', 1) == new Date(99, 04, 18)
     }
 
+    def "test xls multiple services"() {
+        given:
+        def reader = new XLSReader(new FileInputStream(this.class.getResource('test3.xls').file))
+
+        when:
+        def result = reader.read()
+
+        then:
+        result.size() == 4
+        def first = result.first()
+        first.serviceName == 'Comum'
+        first.headers.find {it == 'Nome'}
+        first.headers.find {it == 'Idade'}
+        first.rowValues.size() == 2
+        first.getValue('Nome', 0) == 'John'
+        first.getValue('Idade', 0) == 17
+        first.getValue('Nome', 1) == 'Maria'
+        first.getValue('Idade', 1) == 18
+
+        def second = result[1]
+        second.serviceName == 'Incomum'
+        second.headers.find {it == 'Nome'}
+        second.headers.find {it == 'Idade'}
+        second.rowValues.size() == 1
+        second.getValue('Nome', 0) == 'KKK'
+        second.getValue('Idade', 0) == 110
+
+        def third = result[2]
+        third.serviceName == 'Raro'
+        third.headers.find {it == 'Sobre'}
+        third.rowValues.size() == 1
+        third.getValue('Sobre', 0) == 'Magic'
+
+        def forth = result[3]
+        forth.serviceName == 'Comum'
+        forth.headers.find {it == 'Nome'}
+        forth.headers.find {it == 'Idade'}
+        forth.rowValues.size() == 1
+        forth.getValue('Nome', 0) == 'Luiz'
+        forth.getValue('Idade', 0) == 33
+    }
+
 }

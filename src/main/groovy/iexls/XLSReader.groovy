@@ -37,6 +37,13 @@ class XLSReader {
         sheetData.findAll {it != null}
     }
 
+    List<DataReader> read () {
+        def sheetData = workbook.sheetIterator().collect {
+            extractData it
+        }
+        sheetData.findAll {it != null}.flatten()
+    }
+
     private DataReader extractData(Sheet sheet, String serviceName) {
         def rows = sheet.rowIterator()
         if (!rows.hasNext()) {
@@ -52,6 +59,40 @@ class XLSReader {
         }
 
         new DataReader(serviceName: serviceName, headers: headers, rowValues: rowValues)
+    }
+
+    private List extractData(Sheet sheet) {
+        def rows = sheet.rowIterator()
+        if (!rows.hasNext()) {
+            return null
+        }
+
+        List data = []
+        DataReader currentData
+        String currentServiceName
+        def headers
+
+        rows.each {
+            def firstCell = it.getCell(0)
+            def secondCell = it.getCell(1)
+            if ((firstCell == null || firstCell.getCellType() == Cell.CELL_TYPE_BLANK) && secondCell?.getCellType() != Cell.CELL_TYPE_BLANK ) {
+                headers = extractRow it
+            } else if ((firstCell && firstCell.getCellType() != Cell.CELL_TYPE_BLANK) && (secondCell && secondCell.getCellType() != Cell.CELL_TYPE_BLANK) ) {
+                def row = extractRow(it)
+
+                def serviceName = row.first()
+                row.remove(0)
+                if (serviceName != currentServiceName) {
+                    currentServiceName = serviceName
+                    currentData = new DataReader(serviceName: currentServiceName, headers: headers, rowValues: [row])
+                    data << currentData
+                } else {
+                    currentData.rowValues << row
+                }
+            }
+        }
+
+        data
     }
 
     private List extractRow(Row row) {
