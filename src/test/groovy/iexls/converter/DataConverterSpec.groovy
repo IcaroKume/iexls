@@ -22,6 +22,20 @@ class DataConverterSpec extends Specification {
         result.find {it.name == 'KK' && it.age == 10}
     }
 
+    def "test convert from data to map"() {
+        given:
+        def converter = new DataConverter()
+        def data = new DataReader(headers: ['Name', 'Age'], rowValues: [['JJ', 13], ['KK', 10]])
+
+        when:
+        def result = converter.convert(data, Sample)
+
+        then:
+        result.size() == 2
+        result.find {it.name == 'JJ' && it.age == 13}
+        result.find {it.name == 'KK' && it.age == 10}
+    }
+
     def "test convert to data"() {
         given:
         def converter = new DataConverter()

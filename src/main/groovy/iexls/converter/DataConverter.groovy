@@ -24,6 +24,23 @@ class DataConverter {
         rows
     }
 
+    public <T extends Convertible> List<Map> convertToMap(DataReader data, Class<T> clazz) {
+        def rows = []
+
+        def size = data.rowValues.size()
+        size.times { row ->
+            T type = clazz.newInstance()
+            Map instance = [:]
+            def headerMap = type.mapHearder()
+            headerMap.entrySet().each { entry ->
+                instance[entry.key] = data.getValue(entry.value, row)
+            }
+            rows << instance
+        }
+
+        rows
+    }
+
     public <T extends Convertible> DataWriter convert(List<T> rows) {
         if (!rows) {
             return null
