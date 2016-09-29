@@ -1,5 +1,7 @@
-package iexls
+package iexls.writer
 
+import iexls.reader.DataReader
+import iexls.reader.XLSReader
 import spock.lang.Specification
 
 /**
@@ -24,7 +26,7 @@ class XLSWriterSpec extends Specification {
         when:
         writer.write(dataWriter)
         def reader = new XLSReader(new ByteArrayInputStream(output.toByteArray()))
-        List datas = reader.read()
+        List datas = reader.read('Pessoa')
 
         then:
         DataReader data = datas.first()
@@ -57,7 +59,7 @@ class XLSWriterSpec extends Specification {
         output.close()
 
         def reader = new XLSReader(new FileInputStream('build/testout.xls'))
-        List datas = reader.read()
+        List datas = reader.read('Pessoa')
 
         then:
         DataReader data = datas.first()

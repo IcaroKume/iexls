@@ -1,4 +1,4 @@
-package iexls
+package iexls.writer
 
 import org.apache.poi.ss.usermodel.IndexedColors
 

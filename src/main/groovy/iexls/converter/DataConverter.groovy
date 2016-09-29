@@ -1,22 +1,28 @@
 package iexls.converter
 
-import iexls.DataReader
-import iexls.DataWriter
+import iexls.reader.DataReader
+import iexls.writer.DataWriter
 
 /**
  * Created by icarokume on 26/09/16.
  */
 class DataConverter {
 
+    TransformerFactory transformerFactory
+
+    DataConverter(TransformerFactory transformerFactory) {
+        this.transformerFactory = transformerFactory
+    }
+
     public <T extends Convertible> List<T> convert(DataReader data, Class<T> clazz) {
         def rows = []
 
         def size = data.rowValues.size()
-        size.times { row ->
+        size.times { Integer row ->
             T instance = clazz.newInstance()
             def headerMap = instance.mapHearder()
             headerMap.entrySet().each { entry ->
-                instance[entry.key] = data.getValue(entry.value, row)
+                setInstanceValue(entry, data, instance, instance, row)
             }
             rows << instance
         }
@@ -28,12 +34,12 @@ class DataConverter {
         def rows = []
 
         def size = data.rowValues.size()
-        size.times { row ->
+        size.times { Integer row ->
             T type = clazz.newInstance()
             Map instance = [:]
             def headerMap = type.mapHearder()
             headerMap.entrySet().each { entry ->
-                instance[entry.key] = data.getValue(entry.value, row)
+                setInstanceValue(entry, data, instance, type, row)
             }
             rows << instance
         }
@@ -57,4 +63,11 @@ class DataConverter {
 
         data
     }
+
+    void setInstanceValue(Map.Entry entry, DataReader data, def instance, Object type, Integer row) {
+        def value = data.getValue(entry.value, row)
+        def targetClass = type.class.getField(entry.key).type
+        instance[entry.key] = transformerFactory.transform(value, targetClass)
+    }
+
 }

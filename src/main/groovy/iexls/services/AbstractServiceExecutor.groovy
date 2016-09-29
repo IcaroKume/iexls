@@ -1,6 +1,7 @@
 package iexls.services
 
-import iexls.DataReader
+import iexls.reader.DataReader
+import iexls.converter.TransformerFactory
 
 /**
  * Created by icarokume on 27/09/16.
@@ -9,8 +10,11 @@ abstract class AbstractServiceExecutor {
 
     ServiceFactory serviceFactory
 
-    AbstractServiceExecutor(ServiceFactory serviceFactory) {
+    TransformerFactory transformerFactory
+
+    AbstractServiceExecutor(ServiceFactory serviceFactory, TransformerFactory transformerFactory) {
         this.serviceFactory = serviceFactory
+        this.transformerFactory = transformerFactory
     }
 
     def execute(List<DataReader> dataReader) {
@@ -24,7 +28,7 @@ abstract class AbstractServiceExecutor {
                 return  null
             }
             def service = serviceFactory.createService(ser.clazz)
-            convert(data, ser.clazzDef).each { instance ->
+            convert(data, ser.clazzDef, transformerFactory).each { instance ->
                 try {
                     def result = service.invokeMethod(ser.method, instance)
                     success++
@@ -40,7 +44,7 @@ abstract class AbstractServiceExecutor {
         createServiceResult(success, fail, messages)
     }
 
-    abstract convert(DataReader data, Class clazz)
+    abstract convert(DataReader data, Class clazz, TransformerFactory transformerFactory)
 
     def createServiceResult(Integer success, Integer fail, List<String> messages) {
         new ServiceResult(success: success, fail: fail, messages: messages)

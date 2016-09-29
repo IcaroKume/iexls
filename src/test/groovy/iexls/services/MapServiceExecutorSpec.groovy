@@ -1,6 +1,7 @@
 package iexls.services
 
-import iexls.DataReader
+import iexls.converter.TransformerFactory
+import iexls.reader.DataReader
 import iexls.converter.Convertible
 import spock.lang.Specification
 
@@ -11,7 +12,7 @@ class MapServiceExecutorSpec extends Specification {
 
     def "test"() {
         given:
-        def executor = new MapServiceExecutor(new SampleServiceFactory())
+        def executor = new MapServiceExecutor(new SampleServiceFactory(), new TransformerFactory([]))
         def data = new DataReader(serviceName: 'SampleService',  headers: ['Name', 'Age'], rowValues: [['JJ', 13], ['KK', 10]])
 
         when:
@@ -46,11 +47,11 @@ class MapServiceExecutorSpec extends Specification {
         }
     }
 
-    class Sample implements Convertible {
+    public class Sample implements Convertible {
 
-        String name
+        public String name
 
-        Integer age
+        public Integer age
 
         @Override
         Map mapHearder() {

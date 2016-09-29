@@ -1,6 +1,7 @@
-package iexls
+package iexls.reader
 
 import spock.lang.Specification
+
 /**
  * Created by icarokume on 04/09/16.
  */
@@ -8,7 +9,7 @@ class XLSReaderSpec extends Specification {
 
     def "test xlsx"() {
         given:
-        def reader = new XLSReader(new FileInputStream(this.class.getResource('test1.xlsx').file))
+        def reader = new XLSReader(new FileInputStream(this.class.getResource('../test1.xlsx').file))
 
         when:
         def result = reader.read('Pessoa')
@@ -43,7 +44,7 @@ class XLSReaderSpec extends Specification {
 
     def "test xls"() {
         given:
-        def reader = new XLSReader(new FileInputStream(this.class.getResource('test2.xls').file))
+        def reader = new XLSReader(new FileInputStream(this.class.getResource('../test2.xls').file))
 
         when:
         def result = reader.read('Pessoa')
@@ -78,7 +79,7 @@ class XLSReaderSpec extends Specification {
 
     def "test xls multiple services"() {
         given:
-        def reader = new XLSReader(new FileInputStream(this.class.getResource('test3.xls').file))
+        def reader = new XLSReader(new FileInputStream(this.class.getResource('../test3.xls').file))
 
         when:
         def result = reader.read()

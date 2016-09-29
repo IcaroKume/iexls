@@ -1,19 +1,20 @@
 package iexls.services
 
-import iexls.DataReader
+import iexls.reader.DataReader
 import iexls.converter.DataConverter
+import iexls.converter.TransformerFactory
 
 /**
  * Created by icarokume on 27/09/16.
  */
 class MapServiceExecutor extends AbstractServiceExecutor {
 
-    MapServiceExecutor(ServiceFactory serviceFactory) {
-        super(serviceFactory)
+    MapServiceExecutor(ServiceFactory serviceFactory, TransformerFactory transformerFactory) {
+        super(serviceFactory, transformerFactory)
     }
 
     @Override
-    def convert(DataReader data, Class clazz) {
-        return new DataConverter().convertToMap(data, clazz)
+    def convert(DataReader data, Class clazz, TransformerFactory transformerFactory) {
+        return new DataConverter(transformerFactory).convertToMap(data, clazz)
     }
 }
