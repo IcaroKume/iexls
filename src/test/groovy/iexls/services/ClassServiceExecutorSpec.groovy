@@ -15,12 +15,13 @@ class ClassServiceExecutorSpec extends Specification {
         def data = new DataReader(serviceName: 'SampleService',  headers: ['Name', 'Age'], rowValues: [['JJ', 13], ['KK', 10]])
 
         when:
-        def result = executor.execute(data)
+        def result = executor.execute([data])
 
         then:
-        result.size() == 2
-        result.find {it.name == 'JJ' && it.age == 13}
-        result.find {it.name == 'KK' && it.age == 10}
+        result.success == 1
+        result.fail == 1
+        result.messages.size() == 1
+        result.messages.first() == 'Error KK'
     }
 
     class SampleServiceFactory implements ServiceFactory {
@@ -38,6 +39,9 @@ class ClassServiceExecutorSpec extends Specification {
     class SampleService {
 
         def execute(Sample instance) {
+            if (instance.name == 'KK') {
+                throw new RuntimeException('Error KK')
+            }
             instance
         }
     }
