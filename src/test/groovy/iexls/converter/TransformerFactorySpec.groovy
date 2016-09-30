@@ -31,11 +31,40 @@ class TransformerFactorySpec extends Specification {
         result != 1
     }
 
+    def "test reverse without data transformer"() {
+        given:
+        def factory = new TransformerFactory([])
+
+        when:
+        def result = factory.reverse('1')
+
+        then:
+        result == '1'
+        result != 1
+    }
+
+    def "test reverse with data transformer"() {
+        given:
+        def factory = new TransformerFactory([new SampleDataTransformer()])
+
+        when:
+        def result = factory.reverse('1')
+
+        then:
+        result == 1
+        result != '1'
+    }
+
     class SampleDataTransformer implements DataTransformer {
 
         @Override
         def transform(def value) {
             value.toString()
+        }
+
+        @Override
+        def reverse(def value) {
+            return new Integer(value)
         }
 
         @Override

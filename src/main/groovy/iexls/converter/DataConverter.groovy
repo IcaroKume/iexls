@@ -57,11 +57,15 @@ class DataConverter {
         data.headers = rows.first().mapHearder().values().asList()
         data.rowValues = rows.collect { row ->
             row.mapHearder().entrySet().collect { header ->
-                row[header.key]
+                getRowValue(row[header.key])
             }
         }
 
         data
+    }
+
+    def getRowValue(def value) {
+        transformerFactory.reverse(value)
     }
 
     void setInstanceValue(Map.Entry entry, DataReader data, def instance, Object type, Integer row) {

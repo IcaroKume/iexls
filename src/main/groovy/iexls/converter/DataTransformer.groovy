@@ -7,6 +7,8 @@ interface DataTransformer {
 
     def transform(def value)
 
+    def reverse(def value)
+
     Class from()
 
     Class to()

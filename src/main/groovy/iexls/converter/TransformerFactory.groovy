@@ -13,12 +13,23 @@ class TransformerFactory {
 
     def transform(def value, Class targetClass) {
         DataTransformer transformer =
-                transformers.find {it.from() == value.class && it.to() == targetClass}
+                transformers.find { it.from() == value.class && it.to() == targetClass }
 
         if (!transformer) {
-            return  value
+            return value
         }
 
         transformer.transform(value)
+    }
+
+    def reverse(def value) {
+        DataTransformer transformer =
+                transformers.find { it.to() == value.class }
+
+        if (!transformer) {
+            return value
+        }
+
+        transformer.reverse(value)
     }
 }

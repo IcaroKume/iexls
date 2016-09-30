@@ -74,6 +74,11 @@ class DataConverterSpec extends Specification {
         }
 
         @Override
+        def reverse(def Object value) {
+            return null
+        }
+
+        @Override
         Class from() {
             return String
         }
