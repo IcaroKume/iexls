@@ -77,6 +77,7 @@ class XLSReader {
             def secondCell = it.getCell(1)
             if ((firstCell == null || firstCell.getCellType() == Cell.CELL_TYPE_BLANK) && secondCell?.getCellType() != Cell.CELL_TYPE_BLANK ) {
                 headers = extractRow it
+                headers.remove(0)
             } else if ((firstCell && firstCell.getCellType() != Cell.CELL_TYPE_BLANK) && (secondCell && secondCell.getCellType() != Cell.CELL_TYPE_BLANK) ) {
                 def row = extractRow(it)
 
@@ -96,12 +97,15 @@ class XLSReader {
     }
 
     private List extractRow(Row row) {
-        row.collect {
-            getValue it
+        (0..row.lastCellNum).collect {
+            getValue row.getCell(it)
         }
     }
 
     private def getValue(Cell cell) {
+        if (cell == null) {
+            return null
+        }
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_STRING:
                 return cell.getRichStringCellValue().getString()
@@ -118,7 +122,7 @@ class XLSReader {
             case Cell.CELL_TYPE_FORMULA:
                 return resolveFormula(cell)
             default:
-                return ''
+                return null
         }
     }
 

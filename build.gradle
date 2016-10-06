@@ -33,6 +33,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 task fatJar(type: Jar) {
     baseName = project.name + '-all'
-    from { configurations.compile.findAll {it.name.contains('poi')}.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.compile.findAll {it.name.contains('poi') || it.name.contains('xmlbeans')}.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
