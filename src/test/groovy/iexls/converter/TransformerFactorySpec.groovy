@@ -31,6 +31,17 @@ class TransformerFactorySpec extends Specification {
         result != 1
     }
 
+    def "test null with data transformer"() {
+        given:
+        def factory = new TransformerFactory([new SampleDataTransformer()])
+
+        when:
+        def result = factory.transform(null, String)
+
+        then:
+        result == null
+    }
+
     def "test reverse without data transformer"() {
         given:
         def factory = new TransformerFactory([])
@@ -53,6 +64,17 @@ class TransformerFactorySpec extends Specification {
         then:
         result == 1
         result != '1'
+    }
+
+    def "test null reverse with data transformer"() {
+        given:
+        def factory = new TransformerFactory([new SampleDataTransformer()])
+
+        when:
+        def result = factory.reverse(null)
+
+        then:
+        result == null
     }
 
     class SampleDataTransformer implements DataTransformer {
