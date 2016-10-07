@@ -2,6 +2,7 @@ package iexls.services
 
 import iexls.reader.DataReader
 import iexls.converter.TransformerFactory
+import iexls.reader.RowDescription
 
 /**
  * Created by icarokume on 27/09/16.
@@ -18,6 +19,7 @@ abstract class AbstractServiceExecutor {
     }
 
     def execute(List<DataReader> dataReader) {
+        Integer row = 0
         Integer success = 0
         Integer fail = 0
         List<String> messages = []
@@ -32,12 +34,12 @@ abstract class AbstractServiceExecutor {
                 try {
                     def result = service.invokeMethod(ser.method, instance)
                     success++
-                    addSuccessMessage(messages, result, data.serviceName)
+                    addSuccessMessage(messages, result, data.serviceName, data.rowDescriptions[row])
                 } catch (Exception ex) {
                     fail++
-                    addErrorWarningMessage(messages, ex, data.serviceName)
+                    addErrorWarningMessage(messages, ex, data.serviceName, data.rowDescriptions[row])
                 }
-
+                row++
             }
         }
 
@@ -50,11 +52,11 @@ abstract class AbstractServiceExecutor {
         new ServiceResult(success: success, fail: fail, messages: messages)
     }
 
-    void addErrorWarningMessage(List<String> messages, Exception ex, String serviceName) {
-        messages << ex.getMessage()
+    void addErrorWarningMessage(List<String> messages, Exception ex, String serviceName, RowDescription rowDescription) {
+        messages << "${rowDescription.sheetName} ${rowDescription.rowNumber}: ${ex.getMessage()}"
     }
 
-    void addSuccessMessage(List<String> messages, def result, String serviceName) {
+    void addSuccessMessage(List<String> messages, def result, String serviceName, RowDescription rowDescription) {
 
     }
 }

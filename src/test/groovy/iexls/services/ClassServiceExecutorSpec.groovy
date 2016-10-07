@@ -3,6 +3,7 @@ package iexls.services
 import iexls.converter.TransformerFactory
 import iexls.reader.DataReader
 import iexls.converter.Convertible
+import iexls.reader.RowDescription
 import spock.lang.Specification
 
 /**
@@ -13,7 +14,13 @@ class ClassServiceExecutorSpec extends Specification {
     def "test"() {
         given:
         def executor = new ClassServiceExecutor(new SampleServiceFactory(), new TransformerFactory([]))
-        def data = new DataReader(serviceName: 'SampleService',  headers: ['Name', 'Age'], rowValues: [['JJ', 13], ['KK', 10]])
+        def data = new DataReader(
+                serviceName: 'SampleService',
+                headers: ['Name', 'Age'],
+                rowValues: [['JJ', 13], ['KK', 10]],
+                rowDescriptions: [new RowDescription(rowNumber: 2, sheetName: 'name'),
+                                  new RowDescription(rowNumber: 3, sheetName: 'name')]
+        )
 
         when:
         def result = executor.execute([data])
@@ -22,7 +29,7 @@ class ClassServiceExecutorSpec extends Specification {
         result.success == 1
         result.fail == 1
         result.messages.size() == 1
-        result.messages.first() == 'Error KK'
+        result.messages.first() == 'name 3: Error KK'
     }
 
     class SampleServiceFactory implements ServiceFactory {

@@ -40,6 +40,12 @@ class XLSReaderSpec extends Specification {
         data.getValue('Brasileiro', 1) == false
         data.getValue('Soma', 1) == 5
         data.getValue('Soma data', 1) == new Date(99, 04, 18)
+
+        data.rowDescriptions.size() == 2
+        data.rowDescriptions[0].sheetName == 'Sheet1'
+        data.rowDescriptions[0].rowNumber == 2
+        data.rowDescriptions[1].sheetName == 'Sheet1'
+        data.rowDescriptions[1].rowNumber == 3
     }
 
     def "test xls"() {
@@ -75,6 +81,12 @@ class XLSReaderSpec extends Specification {
         data.getValue('Brasileiro', 1) == false
         data.getValue('Soma', 1) == 5
         data.getValue('Soma data', 1) == new Date(99, 04, 18)
+
+        data.rowDescriptions.size() == 2
+        data.rowDescriptions[0].sheetName == 'Sheet1'
+        data.rowDescriptions[0].rowNumber == 2
+        data.rowDescriptions[1].sheetName == 'Sheet1'
+        data.rowDescriptions[1].rowNumber == 3
     }
 
     def "test xls without some columns"() {
@@ -131,6 +143,12 @@ class XLSReaderSpec extends Specification {
         first.getValue('Nome', 1) == 'Maria'
         first.getValue('Idade', 1) == 18
 
+        first.rowDescriptions.size() == 2
+        first.rowDescriptions[0].sheetName == 'Sheet1'
+        first.rowDescriptions[0].rowNumber == 2
+        first.rowDescriptions[1].sheetName == 'Sheet1'
+        first.rowDescriptions[1].rowNumber == 3
+
         def second = result[1]
         second.serviceName == 'Incomum'
         second.headers.find {it == 'Nome'}
@@ -139,11 +157,19 @@ class XLSReaderSpec extends Specification {
         second.getValue('Nome', 0) == 'KKK'
         second.getValue('Idade', 0) == 110
 
+        second.rowDescriptions.size() == 1
+        second.rowDescriptions[0].sheetName == 'Sheet1'
+        second.rowDescriptions[0].rowNumber == 4
+
         def third = result[2]
         third.serviceName == 'Raro'
         third.headers.find {it == 'Sobre'}
         third.rowValues.size() == 1
         third.getValue('Sobre', 0) == 'Magic'
+
+        third.rowDescriptions.size() == 1
+        third.rowDescriptions[0].sheetName == 'Sheet1'
+        third.rowDescriptions[0].rowNumber == 7
 
         def forth = result[3]
         forth.serviceName == 'Comum'
@@ -152,6 +178,10 @@ class XLSReaderSpec extends Specification {
         forth.rowValues.size() == 1
         forth.getValue('Nome', 0) == 'Luiz'
         forth.getValue('Idade', 0) == 33
+
+        forth.rowDescriptions.size() == 1
+        forth.rowDescriptions[0].sheetName == 'Sheet1'
+        forth.rowDescriptions[0].rowNumber == 10
     }
 
 }

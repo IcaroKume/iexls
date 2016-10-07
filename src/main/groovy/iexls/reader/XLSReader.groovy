@@ -54,11 +54,15 @@ class XLSReader {
 
         def headers = extractRow headerRow
 
-        def rowValues = rows.collect {
-            extractRow it
+        def rowValues = []
+        def rowDescriptions = []
+
+        rows.each {
+            rowValues << extractRow(it)
+            rowDescriptions << new RowDescription(rowNumber: it.rowNum + 1, sheetName: sheet.sheetName)
         }
 
-        new DataReader(serviceName: serviceName, headers: headers, rowValues: rowValues)
+        new DataReader(serviceName: serviceName, headers: headers, rowValues: rowValues, rowDescriptions: rowDescriptions)
     }
 
     private List extractData(Sheet sheet) {
@@ -80,15 +84,17 @@ class XLSReader {
                 headers.remove(0)
             } else if ((firstCell && firstCell.getCellType() != Cell.CELL_TYPE_BLANK) && (secondCell && secondCell.getCellType() != Cell.CELL_TYPE_BLANK) ) {
                 def row = extractRow(it)
+                def rowDescription = new RowDescription(rowNumber: it.rowNum + 1, sheetName: sheet.sheetName)
 
                 def serviceName = row.first()
                 row.remove(0)
                 if (serviceName != currentServiceName) {
                     currentServiceName = serviceName
-                    currentData = new DataReader(serviceName: currentServiceName, headers: headers, rowValues: [row])
+                    currentData = new DataReader(serviceName: currentServiceName, headers: headers, rowValues: [row], rowDescriptions: [rowDescription])
                     data << currentData
                 } else {
                     currentData.rowValues << row
+                    currentData.rowDescriptions << rowDescription
                 }
             }
         }
