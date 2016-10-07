@@ -1,5 +1,6 @@
 package iexls.converter
 
+import iexls.reader.RowDescription
 import spock.lang.Specification
 
 /**
@@ -12,7 +13,7 @@ class TransformerFactorySpec extends Specification {
         def factory = new TransformerFactory([])
 
         when:
-        def result = factory.transform(1, String)
+        def result = factory.transform(1, String, null, null)
 
         then:
         result == 1
@@ -24,7 +25,7 @@ class TransformerFactorySpec extends Specification {
         def factory = new TransformerFactory([new SampleDataTransformer()])
 
         when:
-        def result = factory.transform(1, String)
+        def result = factory.transform(1, String, null, null)
 
         then:
         result == '1'
@@ -36,7 +37,7 @@ class TransformerFactorySpec extends Specification {
         def factory = new TransformerFactory([new SampleDataTransformer()])
 
         when:
-        def result = factory.transform(null, String)
+        def result = factory.transform(null, String, null, null)
 
         then:
         result == null
@@ -80,7 +81,7 @@ class TransformerFactorySpec extends Specification {
     class SampleDataTransformer implements DataTransformer {
 
         @Override
-        def transform(def value) {
+        def transform(def value, def instance, RowDescription rowDescription) {
             value.toString()
         }
 

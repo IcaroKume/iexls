@@ -14,37 +14,23 @@ class DataConverter {
         this.transformerFactory = transformerFactory
     }
 
-    public <T extends Convertible> List<T> convert(DataReader data, Class<T> clazz) {
-        def rows = []
-
-        def size = data.rowValues.size()
-        size.times { Integer row ->
-            T instance = clazz.newInstance()
-            def headerMap = instance.mapHearder()
-            headerMap.entrySet().each { entry ->
-                setInstanceValue(entry, data, instance, instance, row)
-            }
-            rows << instance
+    public <T extends Convertible> T convert(DataReader data, Class<T> clazz, Integer rowNumber) {
+        T instance = clazz.newInstance()
+        def headerMap = instance.mapHearder()
+        headerMap.entrySet().each { entry ->
+            setInstanceValue(entry, data, instance, instance, rowNumber)
         }
-
-        rows
+        instance
     }
 
-    public <T extends Convertible> List<Map> convertToMap(DataReader data, Class<T> clazz) {
-        def rows = []
-
-        def size = data.rowValues.size()
-        size.times { Integer row ->
-            T type = clazz.newInstance()
-            Map instance = [:]
-            def headerMap = type.mapHearder()
-            headerMap.entrySet().each { entry ->
-                setInstanceValue(entry, data, instance, type, row)
-            }
-            rows << instance
+    public <T extends Convertible> Map convertToMap(DataReader data, Class<T> clazz, Integer rowNumber) {
+        T type = clazz.newInstance()
+        Map instance = [:]
+        def headerMap = type.mapHearder()
+        headerMap.entrySet().each { entry ->
+            setInstanceValue(entry, data, instance, type, rowNumber)
         }
-
-        rows
+        instance
     }
 
     public <T extends Convertible> DataWriter convert(List<T> rows) {
@@ -71,7 +57,7 @@ class DataConverter {
     void setInstanceValue(Map.Entry entry, DataReader data, def instance, Object type, Integer row) {
         def value = data.getValue(entry.value, row)
         def targetClass = type.class.getField(entry.key).type
-        instance[entry.key] = transformerFactory.transform(value, targetClass)
+        instance[entry.key] = transformerFactory.transform(value, targetClass, instance, data.rowDescriptions[row])
     }
 
 }

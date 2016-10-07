@@ -1,7 +1,7 @@
 package iexls.services
 
-import iexls.reader.DataReader
 import iexls.converter.TransformerFactory
+import iexls.reader.DataReader
 import iexls.reader.RowDescription
 
 /**
@@ -27,11 +27,12 @@ abstract class AbstractServiceExecutor {
         dataReader.each { data ->
             def ser = serviceFactory.serviceMap()[data.serviceName]
             if (!ser) {
-                return  null
+                return null
             }
             def service = serviceFactory.createService(ser.clazz)
-            convert(data, ser.clazzDef, transformerFactory).each { instance ->
+            data.rowValues.size().times { rowNumber ->
                 try {
+                    def instance = convert data, ser.clazzDef, transformerFactory, rowNumber
                     def result = service.invokeMethod(ser.method, instance)
                     success++
                     addSuccessMessage(messages, result, data.serviceName, data.rowDescriptions[row])
@@ -46,7 +47,7 @@ abstract class AbstractServiceExecutor {
         createServiceResult(success, fail, messages)
     }
 
-    abstract convert(DataReader data, Class clazz, TransformerFactory transformerFactory)
+    abstract convert(DataReader data, Class clazz, TransformerFactory transformerFactory, Integer rowNumber)
 
     def createServiceResult(Integer success, Integer fail, List<String> messages) {
         new ServiceResult(success: success, fail: fail, messages: messages)

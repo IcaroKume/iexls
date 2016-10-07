@@ -1,5 +1,7 @@
 package iexls.converter
 
+import iexls.reader.RowDescription
+
 /**
  * Created by icarokume on 28/09/16.
  */
@@ -11,7 +13,7 @@ class TransformerFactory {
         this.transformers = transformers
     }
 
-    def transform(def value, Class targetClass) {
+    def transform(def value, Class targetClass, def instance, RowDescription rowDescription) {
         if (value == null) {
             return value
         }
@@ -23,7 +25,7 @@ class TransformerFactory {
             return value
         }
 
-        transformer.transform(value)
+        transformer.transform(value, instance, rowDescription)
     }
 
     def reverse(def value) {

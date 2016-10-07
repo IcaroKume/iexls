@@ -1,6 +1,7 @@
 package iexls.converter
 
 import iexls.reader.DataReader
+import iexls.reader.RowDescription
 import spock.lang.Specification
 
 /**
@@ -11,29 +12,29 @@ class DataConverterSpec extends Specification {
     def "test convert from data"() {
         given:
         def converter = new DataConverter(new TransformerFactory([]))
-        def data = new DataReader(headers: ['Name', 'Age'], rowValues: [['JJ', 13], ['KK', 10]])
+        def data = new DataReader(headers: ['Name', 'Age'], rowValues: [['JJ', 13], ['KK', 10]], rowDescriptions: [new RowDescription(), new RowDescription()])
 
         when:
-        def result = converter.convert(data, Sample)
+        def result1 = converter.convert(data, Sample, 0)
+        def result2 = converter.convert(data, Sample, 1)
 
         then:
-        result.size() == 2
-        result.find {it.name == 'JJ' && it.age == 13}
-        result.find {it.name == 'KK' && it.age == 10}
+        result1.name == 'JJ' && result1.age == 13
+        result2.name == 'KK' && result2.age == 10
     }
 
     def "test convert from data to map"() {
         given:
         def converter = new DataConverter(new TransformerFactory([]))
-        def data = new DataReader(headers: ['Name', 'Age'], rowValues: [['JJ', 13], ['KK', 10]])
+        def data = new DataReader(headers: ['Name', 'Age'], rowValues: [['JJ', 13], ['KK', 10]], rowDescriptions: [new RowDescription(), new RowDescription()])
 
         when:
-        def result = converter.convert(data, Sample)
+        def result1 = converter.convert(data, Sample, 0)
+        def result2 = converter.convert(data, Sample, 1)
 
         then:
-        result.size() == 2
-        result.find {it.name == 'JJ' && it.age == 13}
-        result.find {it.name == 'KK' && it.age == 10}
+        result1.name == 'JJ' && result1.age == 13
+        result2.name == 'KK' && result2.age == 10
     }
 
     def "test convert to data"() {
@@ -56,20 +57,19 @@ class DataConverterSpec extends Specification {
     def "test convert to data with converter"() {
         given:
         def converter = new DataConverter(new TransformerFactory([new SampleDataTransformer()]))
-        def data = new DataReader(headers: ['Name', 'Age'], rowValues: [['JJ', '13']])
+        def data = new DataReader(headers: ['Name', 'Age'], rowValues: [['JJ', '13']], rowDescriptions: [new RowDescription()])
 
         when:
-        def result = converter.convert(data, Sample)
+        def result = converter.convert(data, Sample, 0)
 
         then:
-        result.size() == 1
-        result.find {it.name == 'JJ' && it.age == 13}
+        result.name == 'JJ' && result.age == 13
     }
 
     class SampleDataTransformer implements DataTransformer {
 
         @Override
-        def transform(def value) {
+        def transform(def value, def instance, RowDescription rowDescription) {
             Integer.valueOf(value)
         }
 
