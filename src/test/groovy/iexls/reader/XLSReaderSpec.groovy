@@ -184,4 +184,39 @@ class XLSReaderSpec extends Specification {
         forth.rowDescriptions[0].rowNumber == 10
     }
 
+    def "test xls errors"() {
+        given:
+        def reader = new XLSReader(new FileInputStream(this.class.getResource('../test-cell-error.xls').file))
+
+        when:
+        def result = reader.read('Pessoa')
+        def data = result.first()
+
+        then:
+        data.serviceName == 'Pessoa'
+
+        data.headers.find {it == 'Nome'}
+        data.headers.find {it == 'Idade'}
+        data.headers.find {it == 'Nascimento'}
+        data.headers.find {it == 'Brasileiro'}
+        data.headers.find {it == 'Soma'}
+        data.headers.find {it == 'Soma data'}
+
+        data.rowValues.size() == 1
+
+        data.getValue('Nome', 0) == 'John'
+        data.getValue('Idade', 0) == 'aaa'
+        data.getValue('Nascimento', 0) == new Date(99, 04, 11)
+        data.getValue('Brasileiro', 0) == true
+        data.getValue('Soma', 0) == null
+        data.getValue('Soma data', 0) == new Date(99, 04, 14)
+
+        data.rowDescriptions.size() == 1
+        data.rowDescriptions[0].sheetName == 'Sheet1'
+        data.rowDescriptions[0].rowNumber == 2
+
+        data.cellErrors.size() == 1
+        data.cellErrors.contains('E2')
+    }
+
 }

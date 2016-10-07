@@ -11,6 +11,8 @@ class DataReader {
 
     List<RowDescription> rowDescriptions
 
+    List cellErrors
+
     String serviceName
 
     def getValue(String header, Integer row) {

@@ -2,6 +2,7 @@ package iexls.reader
 
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.hssf.util.CellReference
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -45,6 +46,7 @@ class XLSReader {
     }
 
     private DataReader extractData(Sheet sheet, String serviceName) {
+        def cellErrors = []
         def rows = sheet.rowIterator()
         if (!rows.hasNext()) {
             return null
@@ -52,20 +54,32 @@ class XLSReader {
 
         def headerRow = rows.next()
 
-        def headers = extractRow headerRow
+        def headers = extractRow headerRow, cellErrors
+
+        if(isEmpty(headers)) {
+            return null
+        }
 
         def rowValues = []
         def rowDescriptions = []
 
         rows.each {
-            rowValues << extractRow(it)
-            rowDescriptions << new RowDescription(rowNumber: it.rowNum + 1, sheetName: sheet.sheetName)
+            def newRow = extractRow(it, cellErrors)
+            if(!isEmpty(newRow)) {
+                rowValues << newRow
+                rowDescriptions << new RowDescription(rowNumber: it.rowNum + 1, sheetName: sheet.sheetName)
+            }
         }
 
-        new DataReader(serviceName: serviceName, headers: headers, rowValues: rowValues, rowDescriptions: rowDescriptions)
+        new DataReader(serviceName: serviceName, headers: headers, rowValues: rowValues, rowDescriptions: rowDescriptions, cellErrors: cellErrors)
+    }
+
+    private boolean isEmpty(List row) {
+        row.count { it != null } == 0
     }
 
     private List extractData(Sheet sheet) {
+        def cellErrors = []
         def rows = sheet.rowIterator()
         if (!rows.hasNext()) {
             return null
@@ -80,17 +94,17 @@ class XLSReader {
             def firstCell = it.getCell(0)
             def secondCell = it.getCell(1)
             if ((firstCell == null || firstCell.getCellType() == Cell.CELL_TYPE_BLANK) && secondCell?.getCellType() != Cell.CELL_TYPE_BLANK ) {
-                headers = extractRow it
+                headers = extractRow it, cellErrors
                 headers.remove(0)
             } else if ((firstCell && firstCell.getCellType() != Cell.CELL_TYPE_BLANK) && (secondCell && secondCell.getCellType() != Cell.CELL_TYPE_BLANK) ) {
-                def row = extractRow(it)
+                def row = extractRow(it, cellErrors)
                 def rowDescription = new RowDescription(rowNumber: it.rowNum + 1, sheetName: sheet.sheetName)
 
                 def serviceName = row.first()
                 row.remove(0)
                 if (serviceName != currentServiceName) {
                     currentServiceName = serviceName
-                    currentData = new DataReader(serviceName: currentServiceName, headers: headers, rowValues: [row], rowDescriptions: [rowDescription])
+                    currentData = new DataReader(serviceName: currentServiceName, headers: headers, rowValues: [row], rowDescriptions: [rowDescription], cellErrors: cellErrors)
                     data << currentData
                 } else {
                     currentData.rowValues << row
@@ -102,13 +116,13 @@ class XLSReader {
         data
     }
 
-    private List extractRow(Row row) {
+    private List extractRow(Row row, List cellErrors) {
         (0..row.lastCellNum).collect {
-            getValue row.getCell(it)
+            getValue row.getCell(it), cellErrors
         }
     }
 
-    private def getValue(Cell cell) {
+    private def getValue(Cell cell, List cellErrors) {
         if (cell == null) {
             return null
         }
@@ -124,18 +138,20 @@ class XLSReader {
             case Cell.CELL_TYPE_BOOLEAN:
                 return cell.getBooleanCellValue()
             case Cell.CELL_TYPE_ERROR:
-                return '' // subir uma expection???
+                CellReference cellRef = new CellReference(cell.row.getRowNum(), cell.getColumnIndex());
+                cellErrors << (cellRef.cellRefParts[2] + cellRef.cellRefParts[1])
+                return  null
             case Cell.CELL_TYPE_FORMULA:
-                return resolveFormula(cell)
+                return resolveFormula(cell, cellErrors)
             default:
                 return null
         }
     }
 
-    private def resolveFormula(Cell cell) {
+    private def resolveFormula(Cell cell, List cellErrors) {
         def cellValue = formulaEvaluator.evaluate(cell)
         if (!cellValue) {
-            return ''
+            return null
         }
         switch (cellValue.getCellType()) {
             case Cell.CELL_TYPE_STRING:
@@ -147,11 +163,13 @@ class XLSReader {
                     return cell.getNumericCellValue()
                 }
             case Cell.CELL_TYPE_BOOLEAN:
-                return Boolean.toString(cellValue.getBooleanValue());
+                return cellValue.getBooleanValue();
             case Cell.CELL_TYPE_ERROR:
-                return ''
+                CellReference cellRef = new CellReference(cell.row.getRowNum(), cell.getColumnIndex());
+                cellErrors << (cellRef.cellRefParts[2] + cellRef.cellRefParts[1])
+                return  null
             default:
-                return ''
+                return null
         }
     }
 }
