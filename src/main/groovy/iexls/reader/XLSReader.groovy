@@ -64,7 +64,7 @@ class XLSReader {
         def rowDescriptions = []
 
         rows.each {
-            def newRow = extractRow(it, cellErrors)
+            def newRow = extractRow(it, cellErrors, headers.size() - 1)
             if (!isEmpty(newRow)) {
                 rowValues << newRow
                 rowDescriptions << new RowDescription(rowNumber: it.rowNum + 1, sheetName: sheet.sheetName)
@@ -123,10 +123,18 @@ class XLSReader {
         data
     }
 
-    private List extractRow(Row row, List cellErrors) {
-        (0..row.lastCellNum).collect {
+    private List extractRow(Row row, List cellErrors, Integer lastCellNum) {
+        def lastValidCellNum = lastCellNum
+        if (lastValidCellNum == null) {
+            lastValidCellNum = row.lastCellNum - 1
+        }
+        (0..lastValidCellNum).collect {
             getValue row.getCell(it), cellErrors
         }
+    }
+
+    private List extractRow(Row row, List cellErrors) {
+        extractRow(row, cellErrors, null)
     }
 
     private def getValue(Cell cell, List cellErrors) {
