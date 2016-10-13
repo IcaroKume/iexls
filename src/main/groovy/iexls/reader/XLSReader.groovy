@@ -20,9 +20,9 @@ class XLSReader {
     Workbook workbook
 
     XLSReader(InputStream input) {
-         workbook = WorkbookFactory.create(input);
+        workbook = WorkbookFactory.create(input);
 
-        if(workbook instanceof HSSFWorkbook) {
+        if (workbook instanceof HSSFWorkbook) {
             formulaEvaluator = new HSSFFormulaEvaluator((HSSFWorkbook) workbook);
         } else if (workbook instanceof XSSFWorkbook) {
             formulaEvaluator = new XSSFFormulaEvaluator((XSSFWorkbook) workbook);
@@ -31,18 +31,18 @@ class XLSReader {
         }
     }
 
-    List<DataReader> read (String serviceName) {
+    List<DataReader> read(String serviceName) {
         def sheetData = workbook.sheetIterator().collect {
             extractData it, serviceName
         }
-        sheetData.findAll {it != null}
+        sheetData.findAll { it != null }
     }
 
-    List<DataReader> read () {
+    List<DataReader> read() {
         def sheetData = workbook.sheetIterator().collect {
             extractData it
         }
-        sheetData.findAll {it != null}.flatten()
+        sheetData.findAll { it != null }.flatten()
     }
 
     private DataReader extractData(Sheet sheet, String serviceName) {
@@ -56,7 +56,7 @@ class XLSReader {
 
         def headers = extractRow headerRow, cellErrors
 
-        if(isEmpty(headers)) {
+        if (isEmpty(headers)) {
             return null
         }
 
@@ -65,13 +65,20 @@ class XLSReader {
 
         rows.each {
             def newRow = extractRow(it, cellErrors)
-            if(!isEmpty(newRow)) {
+            if (!isEmpty(newRow)) {
                 rowValues << newRow
                 rowDescriptions << new RowDescription(rowNumber: it.rowNum + 1, sheetName: sheet.sheetName)
             }
         }
 
-        new DataReader(serviceName: serviceName, headers: headers, rowValues: rowValues, rowDescriptions: rowDescriptions, cellErrors: cellErrors)
+        new DataReader(
+                sheetName: sheet.sheetName,
+                serviceName: serviceName,
+                headers: headers,
+                rowValues: rowValues,
+                rowDescriptions: rowDescriptions,
+                cellErrors: cellErrors
+        )
     }
 
     private boolean isEmpty(List row) {
@@ -93,10 +100,10 @@ class XLSReader {
         rows.each {
             def firstCell = it.getCell(0)
             def secondCell = it.getCell(1)
-            if ((firstCell == null || firstCell.getCellType() == Cell.CELL_TYPE_BLANK) && secondCell?.getCellType() != Cell.CELL_TYPE_BLANK ) {
+            if ((firstCell == null || firstCell.getCellType() == Cell.CELL_TYPE_BLANK) && secondCell?.getCellType() != Cell.CELL_TYPE_BLANK) {
                 headers = extractRow it, cellErrors
                 headers.remove(0)
-            } else if ((firstCell && firstCell.getCellType() != Cell.CELL_TYPE_BLANK) && (secondCell && secondCell.getCellType() != Cell.CELL_TYPE_BLANK) ) {
+            } else if ((firstCell && firstCell.getCellType() != Cell.CELL_TYPE_BLANK) && (secondCell && secondCell.getCellType() != Cell.CELL_TYPE_BLANK)) {
                 def row = extractRow(it, cellErrors)
                 def rowDescription = new RowDescription(rowNumber: it.rowNum + 1, sheetName: sheet.sheetName)
 
@@ -140,7 +147,7 @@ class XLSReader {
             case Cell.CELL_TYPE_ERROR:
                 CellReference cellRef = new CellReference(cell.row.getRowNum(), cell.getColumnIndex());
                 cellErrors << (cellRef.cellRefParts[2] + cellRef.cellRefParts[1])
-                return  null
+                return null
             case Cell.CELL_TYPE_FORMULA:
                 return resolveFormula(cell, cellErrors)
             default:
@@ -167,7 +174,7 @@ class XLSReader {
             case Cell.CELL_TYPE_ERROR:
                 CellReference cellRef = new CellReference(cell.row.getRowNum(), cell.getColumnIndex());
                 cellErrors << (cellRef.cellRefParts[2] + cellRef.cellRefParts[1])
-                return  null
+                return null
             default:
                 return null
         }

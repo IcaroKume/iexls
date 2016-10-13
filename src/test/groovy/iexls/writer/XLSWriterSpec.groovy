@@ -17,6 +17,7 @@ class XLSWriterSpec extends Specification {
         def bool = true
 
         def dataWriter = new DataWriter(
+                sheetName: 'sheet',
                 headers: ['Nome', 'Idade', 'Nascimento', 'Brasileiro'],
                 rowValues: [[string, number, date, bool]]
         )
@@ -30,6 +31,7 @@ class XLSWriterSpec extends Specification {
 
         then:
         DataReader data = datas.first()
+        data.sheetName == 'sheet'
         data.headers[0] == 'Nome'
         data.headers[1] == 'Idade'
         data.headers[2] == 'Nascimento'

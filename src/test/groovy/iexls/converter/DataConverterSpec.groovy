@@ -43,9 +43,10 @@ class DataConverterSpec extends Specification {
         def samples = [new Sample(name: 'JJ', age: 13), new Sample(name: 'KK', age: 10)]
 
         when:
-        def result = converter.convert(samples)
+        def result = converter.convert(samples, 'sheet')
 
         then:
+        result.sheetName == 'sheet'
         result.headers.size() == 2
         result.headers == ['Name', 'Age']
         result.getValue('Name', 0) == 'JJ'
@@ -69,7 +70,7 @@ class DataConverterSpec extends Specification {
     class SampleDataTransformer implements DataTransformer {
 
         @Override
-        def transform(def value, def instance, RowDescription rowDescription) {
+        def transform(def value, def instance, RowDescription rowDescription, String column) {
             Integer.valueOf(value)
         }
 

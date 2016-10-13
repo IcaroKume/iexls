@@ -33,13 +33,14 @@ class DataConverter {
         instance
     }
 
-    public <T extends Convertible> DataWriter convert(List<T> rows) {
+    public <T extends Convertible> DataWriter convert(List<T> rows, String sheetName) {
         if (!rows) {
             return null
         }
 
         def data = new DataWriter()
 
+        data.sheetName = sheetName
         data.headers = rows.first().mapHearder().values().asList()
         data.rowValues = rows.collect { row ->
             row.mapHearder().entrySet().collect { header ->
@@ -57,7 +58,7 @@ class DataConverter {
     void setInstanceValue(Map.Entry entry, DataReader data, def instance, Object type, Integer row) {
         def value = data.getValue(entry.value, row)
         def targetClass = type.class.getField(entry.key).type
-        instance[entry.key] = transformerFactory.transform(value, targetClass, instance, data.rowDescriptions[row])
+        instance[entry.key] = transformerFactory.transform(value, targetClass, instance, data.rowDescriptions[row], entry.value)
     }
 
 }

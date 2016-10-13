@@ -13,7 +13,7 @@ class TransformerFactory {
         this.transformers = transformers
     }
 
-    def transform(def value, Class targetClass, def instance, RowDescription rowDescription) {
+    def transform(def value, Class targetClass, def instance, RowDescription rowDescription, String column) {
         if (value == null) {
             return value
         }
@@ -25,7 +25,7 @@ class TransformerFactory {
             return value
         }
 
-        transformer.transform(value, instance, rowDescription)
+        transformer.transform(value, instance, rowDescription, column)
     }
 
     def reverse(def value) {

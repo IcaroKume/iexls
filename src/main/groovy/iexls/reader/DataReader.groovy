@@ -15,6 +15,8 @@ class DataReader {
 
     String serviceName
 
+    String sheetName
+
     def getValue(String header, Integer row) {
         rowValues[row][headers.indexOf(header)]
     }

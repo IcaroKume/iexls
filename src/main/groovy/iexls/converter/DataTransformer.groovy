@@ -7,7 +7,7 @@ import iexls.reader.RowDescription
  */
 interface DataTransformer {
 
-    def transform(def value, def instance, RowDescription rowDescription)
+    def transform(def value, def instance, RowDescription rowDescription, String column)
 
     def reverse(def value)
 
