@@ -26,13 +26,13 @@ class XLSWriter {
         int i = 0
         def header = sheet.createRow(i++)
 
-        int j = 0
         CellStyle headerStyle = createStyleHeader(wb, data.headerStyle)
-        data.headers.size().times {
-            def cell = header.createCell(j)
+
+        def countHeaders = data.headers.size()
+        countHeaders.times {
+            def cell = header.createCell(it)
             cell.setCellStyle(headerStyle)
             cell.setCellValue(data.headers[it])
-            sheet.autoSizeColumn(j++)
 
             def comment = data.comments ? data.comments[it] : null
 
@@ -58,7 +58,7 @@ class XLSWriter {
         // rows
         data.rowValues.each { List r ->
             def row = sheet.createRow(i++)
-            j = 0
+            def j = 0
             r.each {
                 def cell = row.createCell(j++)
                 CellStyle rowStyle = createStyleRow(wb, data.rowStyle, it)
@@ -66,6 +66,10 @@ class XLSWriter {
                 cell.setCellStyle(rowStyle)
                 cell.setCellValue(it)
             }
+        }
+
+        countHeaders.times {
+            sheet.autoSizeColumn(it)
         }
 
         wb.write(output);

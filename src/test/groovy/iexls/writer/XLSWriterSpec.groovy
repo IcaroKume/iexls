@@ -44,7 +44,7 @@ class XLSWriterSpec extends Specification {
 
     def "test create file"() {
         given:
-        def string = 'Luiz'
+        def string = 'Luiz Joao Pedro Paulo de Souza Pereira Forte'
         def number = 17
         def date = new Date()
         def bool = true
