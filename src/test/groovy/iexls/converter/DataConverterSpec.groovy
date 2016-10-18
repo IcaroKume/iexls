@@ -2,6 +2,7 @@ package iexls.converter
 
 import iexls.reader.DataReader
 import iexls.reader.RowDescription
+import iexls.writer.Comment
 import spock.lang.Specification
 
 /**
@@ -49,6 +50,13 @@ class DataConverterSpec extends Specification {
         result.sheetName == 'sheet'
         result.headers.size() == 2
         result.headers == ['Name', 'Age']
+
+        result.comments.size() == 2
+        result.comments[0].comment == 'Nome completo'
+        result.comments[0].right == 2
+        result.comments[0].bottom == 2
+        result.comments[1] == null
+
         result.getValue('Name', 0) == 'JJ'
         result.getValue('Age', 0) == 13
         result.getValue('Name', 1) == 'KK'
@@ -97,8 +105,13 @@ class DataConverterSpec extends Specification {
         public Integer age
 
         @Override
-        Map mapHearder() {
+        Map mapHeader() {
             return [name: 'Name', age: 'Age']
+        }
+
+        @Override
+        Map mapCommet() {
+            return ['Name': new Comment(comment:  'Nome completo', bottom: 2, right: 2)]
         }
     }
 }

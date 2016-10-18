@@ -61,8 +61,13 @@ class ClassServiceExecutorSpec extends Specification {
         public Integer age
 
         @Override
-        Map mapHearder() {
+        Map mapHeader() {
             return [name: 'Name', age: 'Age']
+        }
+
+        @Override
+        Map mapCommet() {
+            return [:]
         }
     }
 }

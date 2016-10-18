@@ -51,6 +51,7 @@ class XLSWriterSpec extends Specification {
 
         def dataWriter = new DataWriter(
                 headers: ['Nome', 'Idade', 'Nascimento', 'Brasileiro'],
+                comments: [new Comment(comment: 'Nome completo da pessoa', right: 4, bottom: 4), null],
                 rowValues: [[string, number, date, bool]]
         )
         def output = new FileOutputStream('build/testout.xls')

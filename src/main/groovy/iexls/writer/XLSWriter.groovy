@@ -28,11 +28,31 @@ class XLSWriter {
 
         int j = 0
         CellStyle headerStyle = createStyleHeader(wb, data.headerStyle)
-        data.headers.each {
+        data.headers.size().times {
             def cell = header.createCell(j)
             cell.setCellStyle(headerStyle)
-            cell.setCellValue(it)
+            cell.setCellValue(data.headers[it])
             sheet.autoSizeColumn(j++)
+
+            def comment = data.comments ? data.comments[it] : null
+
+            if (comment) {
+                Drawing drawing = sheet.createDrawingPatriarch()
+                CreationHelper createHelper = wb.getCreationHelper()
+
+                ClientAnchor anchor = createHelper.createClientAnchor();
+                anchor.setCol1(cell.getColumnIndex());
+                anchor.setCol2(cell.getColumnIndex()+comment.right);
+                anchor.setRow1(header.getRowNum());
+                anchor.setRow2(header.getRowNum()+comment.bottom);
+
+                org.apache.poi.ss.usermodel.Comment cellComment = drawing.createCellComment(anchor)
+
+                RichTextString str = createHelper.createRichTextString(comment.comment);
+                cellComment.setString(str);
+                cell.setCellComment(cellComment);
+            }
+
         }
 
         // rows

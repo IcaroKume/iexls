@@ -7,9 +7,11 @@ import org.apache.poi.ss.usermodel.IndexedColors
  */
 class DataWriter {
 
-    List headers
+    List<String> headers
 
-    List rowValues
+    List<Comment> comments
+
+    List<List> rowValues
 
     def getValue(String header, Integer row) {
         rowValues[row][headers.indexOf(header)]

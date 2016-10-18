@@ -16,7 +16,7 @@ class DataConverter {
 
     public <T extends Convertible> T convert(DataReader data, Class<T> clazz, Integer rowNumber) {
         T instance = clazz.newInstance()
-        def headerMap = instance.mapHearder()
+        def headerMap = instance.mapHeader()
         headerMap.entrySet().each { entry ->
             setInstanceValue(entry, data, instance, instance, rowNumber)
         }
@@ -26,7 +26,7 @@ class DataConverter {
     public <T extends Convertible> Map convertToMap(DataReader data, Class<T> clazz, Integer rowNumber) {
         T type = clazz.newInstance()
         Map instance = [:]
-        def headerMap = type.mapHearder()
+        def headerMap = type.mapHeader()
         headerMap.entrySet().each { entry ->
             setInstanceValue(entry, data, instance, type, rowNumber)
         }
@@ -41,9 +41,14 @@ class DataConverter {
         def data = new DataWriter()
 
         data.sheetName = sheetName
-        data.headers = rows.first().mapHearder().values().asList()
+        data.headers = rows.first().mapHeader().values().asList()
+
+        data.comments = data.headers.collect {
+            rows.first().mapCommet()[it]
+        }
+
         data.rowValues = rows.collect { row ->
-            row.mapHearder().entrySet().collect { header ->
+            row.mapHeader().entrySet().collect { header ->
                 getRowValue(row[header.key])
             }
         }
