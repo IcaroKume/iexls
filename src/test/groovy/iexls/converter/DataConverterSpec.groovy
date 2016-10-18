@@ -44,7 +44,7 @@ class DataConverterSpec extends Specification {
         def samples = [new Sample(name: 'JJ', age: 13), new Sample(name: 'KK', age: 10)]
 
         when:
-        def result = converter.convert(samples, 'sheet')
+        def result = converter.convert(Sample, samples, 'sheet')
 
         then:
         result.sheetName == 'sheet'
@@ -73,6 +73,22 @@ class DataConverterSpec extends Specification {
 
         then:
         result.name == 'JJ' && result.age == 13
+    }
+
+    def "test convert from data with unexpected headers"() {
+        given:
+        def converter = new DataConverter(new TransformerFactory([]))
+        def data = new DataReader(headers: ['Name', 'Age', 'Bla'], rowValues: [['JJ', 13], ['KK', 10], [null, null, 'Bla']], rowDescriptions: [new RowDescription(), new RowDescription(), new RowDescription()])
+
+        when:
+        def result1 = converter.convert(data, Sample, 0)
+        def result2 = converter.convert(data, Sample, 1)
+        def result3 = converter.convert(data, Sample, 2)
+
+        then:
+        result1.name == 'JJ' && result1.age == 13
+        result2.name == 'KK' && result2.age == 10
+        result3 == null
     }
 
     class SampleDataTransformer implements DataTransformer {

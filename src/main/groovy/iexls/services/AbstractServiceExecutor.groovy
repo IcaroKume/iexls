@@ -33,9 +33,11 @@ abstract class AbstractServiceExecutor {
             data.rowValues.size().times { rowNumber ->
                 try {
                     def instance = convert data, ser.clazzDef, transformerFactory, rowNumber
-                    def result = service.invokeMethod(ser.method, instance)
-                    success++
-                    addSuccessMessage(messages, result, data.serviceName, data.rowDescriptions[row])
+                    if (instance) {
+                        def result = service.invokeMethod(ser.method, instance)
+                        success++
+                        addSuccessMessage(messages, result, data.serviceName, data.rowDescriptions[row])
+                    }
                 } catch (Exception ex) {
                     fail++
                     addErrorWarningMessage(messages, ex, data.serviceName, data.rowDescriptions[row])

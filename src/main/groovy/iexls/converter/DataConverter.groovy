@@ -17,6 +17,18 @@ class DataConverter {
     public <T extends Convertible> T convert(DataReader data, Class<T> clazz, Integer rowNumber) {
         T instance = clazz.newInstance()
         def headerMap = instance.mapHeader()
+
+        def hasValue = false
+        headerMap.values().each {
+            if (data.getValue(it, rowNumber) != null) {
+                hasValue = true
+            }
+        }
+
+        if (!hasValue) {
+            return null
+        }
+
         headerMap.entrySet().each { entry ->
             setInstanceValue(entry, data, instance, instance, rowNumber)
         }
@@ -27,24 +39,34 @@ class DataConverter {
         T type = clazz.newInstance()
         Map instance = [:]
         def headerMap = type.mapHeader()
+
+        def hasValue = false
+        headerMap.values().each {
+            if (data.getValue(it, rowNumber) != null) {
+                hasValue = true
+            }
+        }
+
+        if (!hasValue) {
+            return null
+        }
+
         headerMap.entrySet().each { entry ->
             setInstanceValue(entry, data, instance, type, rowNumber)
         }
         instance
     }
 
-    public <T extends Convertible> DataWriter convert(List<T> rows, String sheetName) {
-        if (!rows) {
-            return null
-        }
-
+    public <T extends Convertible> DataWriter convert(Class<T> type, List<T> rows, String sheetName) {
         def data = new DataWriter()
+        def typeInstance = type.newInstance()
 
         data.sheetName = sheetName
-        data.headers = rows.first().mapHeader().values().asList()
+
+        data.headers = typeInstance.mapHeader().values().asList()
 
         data.comments = data.headers.collect {
-            rows.first().mapCommet()[it]
+            typeInstance.mapCommet()[it]
         }
 
         data.rowValues = rows.collect { row ->

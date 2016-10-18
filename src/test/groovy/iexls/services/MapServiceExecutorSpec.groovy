@@ -15,10 +15,11 @@ class MapServiceExecutorSpec extends Specification {
         given:
         def executor = new MapServiceExecutor(new SampleServiceFactory(), new TransformerFactory([]))
         def data = new DataReader(serviceName: 'SampleService',
-                headers: ['Name', 'Age'],
-                rowValues: [['JJ', 13], ['KK', 10]],
+                headers: ['Name', 'Age', 'BLA'],
+                rowValues: [['JJ', 13], ['KK', 10], [null, null, 'BLA']],
                 rowDescriptions: [new RowDescription(rowNumber: 2, sheetName: 'name'),
-                                  new RowDescription(rowNumber: 3, sheetName: 'name')]
+                                  new RowDescription(rowNumber: 3, sheetName: 'name'),
+                                  new RowDescription(rowNumber: 4, sheetName: 'name')]
         )
 
         when:
