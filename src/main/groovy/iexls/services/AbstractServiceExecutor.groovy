@@ -40,7 +40,7 @@ abstract class AbstractServiceExecutor {
                     }
                 } catch (Exception ex) {
                     fail++
-                    rowsWithError << [(data):rowNumber]
+                    rowsWithError << new Tuple(data,rowNumber)
                     addErrorWarningMessage(messages, ex, dataReader[data].serviceName, dataReader[data].rowDescriptions[rowNumber])
                 }
             }
