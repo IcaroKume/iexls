@@ -11,4 +11,6 @@ class ServiceResult {
 
     List<String> messages
 
+    List<Map<Integer, Integer>> rowsWithError
+
 }

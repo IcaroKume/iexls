@@ -19,40 +19,40 @@ abstract class AbstractServiceExecutor {
     }
 
     def execute(List<DataReader> dataReader) {
-        Integer row = 0
         Integer success = 0
         Integer fail = 0
+        List<Map<Integer, Integer>> rowsWithError = []
         List<String> messages = []
 
-        dataReader.each { data ->
-            def ser = serviceFactory.serviceMap()[data.serviceName]
+        dataReader.size().times { data ->
+            def ser = serviceFactory.serviceMap()[dataReader[data].serviceName]
             if (!ser) {
                 return null
             }
             def service = serviceFactory.createService(ser.clazz)
-            data.rowValues.size().times { rowNumber ->
+            dataReader[data].rowValues.size().times { rowNumber ->
                 try {
-                    def instance = convert data, ser.clazzDef, transformerFactory, rowNumber
+                    def instance = convert dataReader[data], ser.clazzDef, transformerFactory, rowNumber
                     if (instance) {
                         def result = service.invokeMethod(ser.method, instance)
                         success++
-                        addSuccessMessage(messages, result, data.serviceName, data.rowDescriptions[row])
+                        addSuccessMessage(messages, result, dataReader[data].serviceName, dataReader[data].rowDescriptions[rowNumber])
                     }
                 } catch (Exception ex) {
                     fail++
-                    addErrorWarningMessage(messages, ex, data.serviceName, data.rowDescriptions[row])
+                    rowsWithError << [(data):rowNumber]
+                    addErrorWarningMessage(messages, ex, dataReader[data].serviceName, dataReader[data].rowDescriptions[rowNumber])
                 }
-                row++
             }
         }
 
-        createServiceResult(success, fail, messages)
+        createServiceResult(success, fail, messages, rowsWithError)
     }
 
     abstract convert(DataReader data, Class clazz, TransformerFactory transformerFactory, Integer rowNumber)
 
-    def createServiceResult(Integer success, Integer fail, List<String> messages) {
-        new ServiceResult(success: success, fail: fail, messages: messages)
+    def createServiceResult(Integer success, Integer fail, List<String> messages, List<Map<Integer, Integer>> rowsWithError) {
+        new ServiceResult(success: success, fail: fail, messages: messages, rowsWithError: rowsWithError)
     }
 
     void addErrorWarningMessage(List<String> messages, Exception ex, String serviceName, RowDescription rowDescription) {
