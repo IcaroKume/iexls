@@ -31,7 +31,7 @@ class ClassServiceExecutorSpec extends Specification {
         result.fail == 1
         result.messages.size() == 1
         result.messages.first() == 'name 3: Error KK'
-        result.rowsWithError == [new Tuple(0, 1)]
+        result.rowsWithError == [new Tuple(0, 1, 'name 3: Error KK')]
     }
 
     class SampleServiceFactory implements ServiceFactory {

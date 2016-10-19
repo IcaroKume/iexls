@@ -36,12 +36,13 @@ abstract class AbstractServiceExecutor {
                     if (instance) {
                         def result = service.invokeMethod(ser.method, instance)
                         success++
-                        addSuccessMessage(messages, result, dataReader[data].serviceName, dataReader[data].rowDescriptions[rowNumber])
                     }
                 } catch (Exception ex) {
                     fail++
-                    rowsWithError << new Tuple(data,rowNumber)
-                    addErrorWarningMessage(messages, ex, dataReader[data].serviceName, dataReader[data].rowDescriptions[rowNumber])
+                    def errorMessage = getErrorMessage(ex, dataReader[data].serviceName, dataReader[data].rowDescriptions[rowNumber])
+                    messages << errorMessage
+                    rowsWithError << new Tuple(data, rowNumber, errorMessage)
+
                 }
             }
         }
@@ -55,11 +56,8 @@ abstract class AbstractServiceExecutor {
         new ServiceResult(success: success, fail: fail, messages: messages, rowsWithError: rowsWithError)
     }
 
-    void addErrorWarningMessage(List<String> messages, Exception ex, String serviceName, RowDescription rowDescription) {
-        messages << "${rowDescription.sheetName} ${rowDescription.rowNumber}: ${ex.getMessage()}"
+    String getErrorMessage(Exception ex, String serviceName, RowDescription rowDescription) {
+        "${rowDescription.sheetName} ${rowDescription.rowNumber}: ${ex.getMessage()}"
     }
 
-    void addSuccessMessage(List<String> messages, def result, String serviceName, RowDescription rowDescription) {
-
-    }
 }
