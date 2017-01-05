@@ -55,13 +55,17 @@ class XLSWriter {
 
         }
 
+        CellStyle defaultRowStyle = createStyleRow(wb, data.rowStyle)
+        CellStyle dateRowStyle = createDateStyleRow(wb, data.rowStyle)
+
         // rows
         data.rowValues.each { List r ->
             def row = sheet.createRow(i++)
             def j = 0
             r.each {
                 def cell = row.createCell(j++)
-                CellStyle rowStyle = createStyleRow(wb, data.rowStyle, it)
+
+                def rowStyle = it in Date ? dateRowStyle : defaultRowStyle
 
                 cell.setCellStyle(rowStyle)
                 cell.setCellValue(it)
@@ -80,11 +84,15 @@ class XLSWriter {
         createStyle(wb, cellStyle, null)
     }
 
-    protected createStyleRow(Workbook wb, IexlsCellStyle cellStyle, def value) {
-        createStyle(wb, cellStyle, value)
+    protected createStyleRow(Workbook wb, IexlsCellStyle cellStyle) {
+        createStyle(wb, cellStyle, null)
     }
 
-    protected CellStyle createStyle(Workbook wb, IexlsCellStyle cellStyle, def value) {
+    protected createDateStyleRow(Workbook wb, IexlsCellStyle cellStyle) {
+        createStyle(wb, cellStyle, Date)
+    }
+
+    protected CellStyle createStyle(Workbook wb, IexlsCellStyle cellStyle, Class clazz) {
         CreationHelper createHelper = wb.getCreationHelper()
 
         def style = wb.createCellStyle()
@@ -99,7 +107,7 @@ class XLSWriter {
         style.setBorderTop(CellStyle.BORDER_THIN);
         style.setTopBorderColor(IndexedColors.BLACK.getIndex());
 
-        if (value in Date) {
+        if (clazz == Date) {
             style.setDataFormat(
                     createHelper.createDataFormat().getFormat("m/d/yy"))
         }

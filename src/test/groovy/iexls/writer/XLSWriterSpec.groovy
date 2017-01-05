@@ -75,4 +75,34 @@ class XLSWriterSpec extends Specification {
         data.getValue('Nascimento', 0) == date
         data.getValue('Brasileiro', 0) == bool
     }
+
+    def "test style"() {
+        given:
+        def string = 'Luiz'
+        def number = 17
+        def date = new Date()
+        def bool = true
+
+        def rows = []
+        for (int i = 0; i<10000; i++) {
+            rows << [string, number, date, bool]
+        }
+
+        def dataWriter = new DataWriter(
+                sheetName: 'sheet',
+                headers: ['Nome', 'Idade', 'Nascimento', 'Brasileiro'],
+                rowValues: rows
+        )
+        def output = new ByteArrayOutputStream()
+        def writer = new XLSWriter(output)
+
+        when:
+        writer.write(dataWriter)
+        def reader = new XLSReader(new ByteArrayInputStream(output.toByteArray()))
+        List datas = reader.read('Pessoa')
+
+        then:
+        datas.first().rowValues.size() == 10000
+
+    }
 }
